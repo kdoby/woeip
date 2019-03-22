@@ -1,8 +1,152 @@
 {% extends '__base.html' %}
 {% block content %}
+<script src="https://github.com/mdn/dom-examples/tree/master/drag-and-drop"></script>
 <form method="post" enctype="multipart/form-data">
 	{% csrf_token %}
 	{{form.as_p}}
-	<button type="submit">Submit</button>
+	<script type="text/javascript" src="https://developer.mozilla.org/En/DragDrop/DataTransfer"></script>
+<!-- Drag and Drop form-->
+<div id="output" style="min-height: 200px; white-space: pre; border: 1px solid black;"
+     ondragenter="document.getElementById('output').textContent = 'Drop files here.'; event.stopPropagation(); event.preventDefault(); ondrag(event);"
+     ondragover="event.stopPropagation(); event.preventDefault(); 
+     ondrag(event);"
+     ondrop="event.stopPropagation(); event.preventDefault();
+     dodrop(event);">
+     Drop your DusTrak and GPS files here
+</div>
+<br>
+<br>
+<!-- Manual Upload Form-->
+<kd style='margin-top:0;margin-left:25%;margin-right:25%;'>
+          <font size="4">or find files on your computer:</font>
+          <br>
+          <ka style='margin-top:0;margin-left:25%;margin-right:25%;'>
+          <font size="2">1. Click the Browse button. 2. Select a csv and log file that are part of the same air pollution survey. <br> <kb style='margin-top:0;margin-left:25%;margin-right:25%;'> (These should be in the same folder). 3. Click on the open button on the lower right side of the pop up. <br> <kb style='margin-top:0;margin-left:25%;margin-right:25%;'> 4. Click the Upload Button</font>
+        </kb>
+      </ka>
+          <kz>
+            <!-- Upload form, as  of now more than 2 files are allowed but causes program to not work if there are multiple files with extension .csv or .log-->
+            <form id="upload-form" method="POST" enctype="multipart/form-data"style="margin-left: 25%; margin-right: 25%;">
+              <!-- Allows upload of files -->
+                <input type="file" name="file" multiple>
+                <!-- Submit button -->
+                <input type="submit" value="Upload">
+                
+            </form>
+
+    
+          </kz>
+
+        </kd>
+<!-- Code for drag and drop -->
+<script type="text/javascript">
+	Array.prototype.contains = function ( needle ) {
+	   for (i in this) {
+	      if (this[i] == needle) return true;
+	   }
+	   return false;
+	}
+	function ondrag(event)
+	{
+		output("Drop files here.");
+	}
+
+	function dodrop(event)
+	{
+	  var count = 0;
+	  var dt = event.dataTransfer;
+	  var files = dt.files;
+	  var extensions = ['','','','','','',''];
+	  var count = files.length;
+	  output("File Count: " + count + "\n");
+	  var numbers = [null,null];
+	  //output("extensions"+extensions.length)
+	  	if (files.length >= 2) {
+	  		//output("File Count: " + count + "\n");
+	  		for (var i = 0; i < files.length; i++) {
+	  			//output(files[i].name)
+	  			extensions[i] = getext(files[i].name);
+	  			if (extensions[i] == 'log') {
+	  				numbers[0] = i;
+	  			} else if (extensions[i] == 'csv') {
+	  				numbers[1] = i;
+	  			} 
+	  			//output(extensions[i]+" ")
+
+	    	}
+	    	
+	    	if (extensions.contains('log') && extensions.contains('csv')) {
+	    		//output(extensions);
+	    		
+	    		output("Uploading...")
+	    		air_quality = files[numbers[1]];
+	    		gps = files[numbers[0]];
+	    		create_post(air_quality,gps);
+
+	    	} else {
+	    		output("Incorrect file types. Takes 1 csv and 1 gps log file.")
+	    	}
+
+	  	} else {
+	  		output("Requires two files, a csv and a log file.")
+	  	}
+	    
+	}
+
+	function output(text)
+	{
+	  document.getElementById("output").textContent = text;
+	  //dump(text);
+	}
+	function getext(filename)
+	{
+		return (/[.]/.exec(filename)) ? /[^.]+$/.exec(filename) : undefined;
+	}
+
+	// AJAX for posting
+	function create_post(air_quality,gps) {
+	    console.log("create post is working!") 
+	    $.ajax({
+	        url : "upload/", // the endpoint
+	        type : "POST", // http method
+	        data : { air_Quality : air_quality }, // data sent with the post request
+
+	        // handle a successful response
+	        success : function(json) {
+	            
+	            console.log(json); // log the returned json to the console
+	            console.log("success"); 
+	        },
+
+	        // handle a non-successful response
+	        error : function(xhr,errmsg,err) {
+	            $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+	                " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+	            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+	        }
+	    });
+	    $.ajax({
+	        url : "upload/", // the endpoint
+	        type : "POST", // http method
+	        data : { GPS : gps }, // data sent with the post request
+
+	        // handle a successful response
+	        success : function(json) {
+	            $('#post-text').val(''); // remove the value from the input
+	            console.log(json); // log the returned json to the console
+	            console.log("success"); 
+	        },
+
+	        // handle a non-successful response
+	        error : function(xhr,errmsg,err) {
+	            $('#results').html("<div class='alert-box alert radius' data-alert>Oops! We have encountered an error: "+errmsg+
+	                " <a href='#' class='close'>&times;</a></div>"); // add the error to the dom
+	            console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+	        }
+	    });
+	};
+
+	
+</script>
 </form>
 {% endblock %}
