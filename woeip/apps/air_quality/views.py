@@ -22,11 +22,9 @@ def upload(request):
     """
     request_user = request.user
     if request.method == 'POST':
-        
         air_quality = request.POST.get('air_Quality')
         gps = request.POST.get('gps')
         response_data = {}
-
         #post = Post(text=air_quality, author=request.user)
         air_quality.save()
         gps.save()

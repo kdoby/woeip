@@ -1,15 +1,16 @@
 {% extends '__base.html' %}
 {% block content %}
 <script src="https://github.com/mdn/dom-examples/tree/master/drag-and-drop"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 <form method="post" enctype="multipart/form-data">
 	{% csrf_token %}
 	{{form.as_p}}
 	<script type="text/javascript" src="https://developer.mozilla.org/En/DragDrop/DataTransfer"></script>
 <!-- Drag and Drop form-->
 <div id="output" style="min-height: 200px; white-space: pre; border: 1px solid black;"
-     ondragenter="document.getElementById('output').textContent = 'Drop files here.'; event.stopPropagation(); event.preventDefault(); ondrag(event);"
+     ondragenter="document.getElementById('output').textContent = 'Drop files here.'; event.stopPropagation(); event.preventDefault(); "
      ondragover="event.stopPropagation(); event.preventDefault(); 
-     ondrag(event);"
+     "
      ondrop="event.stopPropagation(); event.preventDefault();
      dodrop(event);">
      Drop your DusTrak and GPS files here
@@ -53,6 +54,7 @@
 
 	function dodrop(event)
 	{
+	  var maxFileSize = 100000000000000000000000000000000000000000000000000000000000000000000000000000;
 	  var count = 0;
 	  var dt = event.dataTransfer;
 	  var files = dt.files;
@@ -77,20 +79,34 @@
 	    	
 	    	if (extensions.contains('log') && extensions.contains('csv')) {
 	    		//output(extensions);
-	    		
 	    		output("Uploading...")
 	    		air_quality = files[numbers[1]];
-	    		gps = files[numbers[0]];
-	    		create_post(air_quality,gps);
+		    	gps = files[numbers[0]];
+		    	create_post(air_quality,gps);
+	    		/*if (calculatefileSize(files) < maxFileSize) {
+		    		air_quality = files[numbers[1]];
+		    		gps = files[numbers[0]];
+		    		create_post(air_quality,gps);
+	    	    } else {
+	    	    	output("File size is larger than max file size.")
+	    	    }*/	
 
 	    	} else {
-	    		output("Incorrect file types. Takes 1 csv and 1 gps log file.")
+	    		output("Incorrect file types. Takes 1 csv and 1 gps log file.");
 	    	}
 
 	  	} else {
-	  		output("Requires two files, a csv and a log file.")
+	  		output("Requires two files, a csv and a log file.");
 	  	}
 	    
+	}
+	function calculatefileSize(files) 
+	{
+		var totalsize = files[0];
+		for (var i =1; i < files.length; i++) {
+			totalsize += files[i].size;
+		}
+		return totalsize;
 	}
 
 	function output(text)
@@ -107,10 +123,11 @@
 	function create_post(air_quality,gps) {
 	    console.log("create post is working!") 
 	    $.ajax({
-	        url : "upload/", // the endpoint
+	        url : "/files/upload/", // the endpoint
 	        type : "POST", // http method
 	        data : { air_Quality : air_quality }, // data sent with the post request
-
+	        processData: false, 
+	        contentType: false,
 	        // handle a successful response
 	        success : function(json) {
 	            
@@ -126,10 +143,11 @@
 	        }
 	    });
 	    $.ajax({
-	        url : "upload/", // the endpoint
+	        url : "/files/upload/", // the endpoint
 	        type : "POST", // http method
 	        data : { GPS : gps }, // data sent with the post request
-
+	        processData: false, 
+	        contentType: false,
 	        // handle a successful response
 	        success : function(json) {
 	            $('#post-text').val(''); // remove the value from the input
