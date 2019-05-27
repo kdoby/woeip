@@ -1,61 +1,47 @@
 import logging
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import redirect, render
-from django.utils.encoding import force_text
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views import View
 
-from woeip.apps.air_quality import dustrak, forms, models
+from .forms import DocumentForm
+from .models import Document
 
 logger = logging.getLogger(__name__)
 
+class Upload(LoginRequiredMixin, View):
+    def get(self, request):
+        documents_list = Document.objects.all()
+        return render(self.request, 'air_quality/upload.html', {'documents': documents_list})
 
-@login_required
-def upload(request):
-    """Upload data for a session collected using the Dustrak air quality device and a separate GPS
-    log file.
-    """
-    request_user = request.user
-    if request.method == 'POST':
-        form = forms.DustrakSessionForm(request.POST, request.FILES)
-        form_instance = form.instance
+    def post(self, request):
+        files = self.request.FILES
+        # logger.log(len(files))
+        form = DocumentForm(self.request.POST, files)
         if form.is_valid():
-            form.save()
-            try:
-                air_sensor = models.Sensor.objects.get(name='Dustrak')
-                gps_sensor = models.Sensor.objects.get(name='GPS')
+            document = form.save()
+            data = {'is_valid': True, 'description': document.file.name, 'url': document.file.url}
+        else:
+            data = {'is_valid': False}
+        return JsonResponse(data)
 
-            except (ObjectDoesNotExist) as e:
-                messages.add_message(request, messages.ERROR, f'File upload failed, error: {e}')
-                logger.exception('Could not find sensor information')
-                return redirect('upload')
 
-            air_quality = models.SessionData(upload=request.FILES['air_quality'],
-                                             sensor=air_sensor,
-                                             session=form_instance,
-                                             uploaded_by=request_user)
-            gps = models.SessionData(upload=request.FILES['gps'],
-                                     sensor=gps_sensor,
-                                     session=form_instance,
-                                     uploaded_by=request_user)
+# @login_required
+# def upload(request):
+#     """Upload data for a session collected using the Dustrak air quality device and a separate GPS
+#     log file.
+#     """
+#     if request.method == 'POST':
+#         form = forms.DocumentForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('view_files')
+#     else:
+#         form = forms.DocumentForm()
+#     return render(request, 'air_quality/upload.html', { 'form' : form })
 
-            air_quality_contents = force_text(request.FILES['air_quality'].read())
-            _, air_quality_data = dustrak.load_dustrak(air_quality_contents, form.data['timezone'])
-
-            gps_contents = force_text(request.FILES['gps'].read())
-            gps_data = dustrak.load_gps(gps_contents)
-            joined_data = dustrak.join(air_quality_data, gps_data)
-
-            air_quality.save()
-            gps.save()
-            dustrak.save(joined_data, form_instance)
-
-            messages.add_message(request, messages.SUCCESS, 'Files successfully uploaded')
-            return redirect('upload')
-
-    else:
-        form = forms.DustrakSessionForm(initial={'collected_by': request_user})
-
-    return render(request, 'air_quality/upload.html', {
-        'user': request_user, 'form': form, 'upload_page': 'active'})
+# def view_files(request):
+#     documents = models.Document.objects.all()
+#     return render(request, 'air_quality/view_files.html', { 'documents': documents })

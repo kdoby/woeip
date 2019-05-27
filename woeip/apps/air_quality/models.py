@@ -6,7 +6,7 @@ from django_extensions.db.models import TimeStampedModel
 
 from woeip.apps.core.models import User
 
-
+# Not being used
 class Route(models.Model):
     name = models.CharField(max_length=256, unique=True)
     path = LineStringField()
@@ -14,7 +14,7 @@ class Route(models.Model):
     def __str__(self):
         return self.name
 
-
+# Assumes it needs to cover several cases. There are only two devices: GPS and Dustrak
 class Device(models.Model):
     name = models.CharField(max_length=256)
     manufacturer = models.CharField(max_length=256)
@@ -26,7 +26,7 @@ class Device(models.Model):
     def __str__(self):
         return f"{self.name} {self.model_number} {self.serial_number}"
 
-
+# Who cares at this point?
 class Sensor(models.Model):
     """A sensor is something that measures something, i.e., it produces a single
     measurement value at a time.
@@ -42,7 +42,7 @@ class Sensor(models.Model):
     def __str__(self):
         return f"{self.name} ({self.device.name})"
 
-
+# Confusing name, compared Session Data
 class Session(models.Model):
     """A single air quality outing. Can link to several SessionData, e.g., raw data files."""
     date_collected = models.DateTimeField()
@@ -76,3 +76,12 @@ class Data(models.Model):
     value = models.FloatField()
     time = models.DateTimeField()
     latlon = PointField()
+
+
+# Simple is better than complex tutorial
+
+class Document(models.Model):
+    title = models.CharField(max_length=255, blank=True)
+    file = models.FileField(upload_to='documents/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    

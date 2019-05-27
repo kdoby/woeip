@@ -1,5 +1,6 @@
 # Test emails
 sent_emails/*.log
+media/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
