@@ -3,7 +3,6 @@ from pytz import common_timezones
 
 from woeip.apps.air_quality import models
 
-
 # class DustrakSessionForm(forms.ModelForm):
 #     air_quality = forms.FileField()
 #     gps = forms.FileField()
@@ -13,8 +12,8 @@ from woeip.apps.air_quality import models
 #         model = models.Session
 #         fields = ('collected_by', 'date_collected', 'route', 'air_quality', 'gps', 'timezone')
 
+
 class DocumentForm(forms.ModelForm):
     class Meta:
         model = models.Document
         fields = ('file',)
-        

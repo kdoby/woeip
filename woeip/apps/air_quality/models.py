@@ -6,6 +6,7 @@ from django_extensions.db.models import TimeStampedModel
 
 from woeip.apps.core.models import User
 
+
 # Not being used
 class Route(models.Model):
     name = models.CharField(max_length=256, unique=True)
@@ -13,6 +14,7 @@ class Route(models.Model):
 
     def __str__(self):
         return self.name
+
 
 # Assumes it needs to cover several cases. There are only two devices: GPS and Dustrak
 class Device(models.Model):
@@ -25,6 +27,7 @@ class Device(models.Model):
 
     def __str__(self):
         return f"{self.name} {self.model_number} {self.serial_number}"
+
 
 # Who cares at this point?
 class Sensor(models.Model):
@@ -41,6 +44,7 @@ class Sensor(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.device.name})"
+
 
 # Confusing name, compared Session Data
 class Session(models.Model):
@@ -84,4 +88,3 @@ class Document(models.Model):
     title = models.CharField(max_length=255, blank=True)
     file = models.FileField(upload_to='documents/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    
