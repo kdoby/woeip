@@ -13,24 +13,40 @@
   <div class="grid-x">
     <button type="button" class="button js-upload-documents">Find files on your computer</button>
   </div>
+  <br> 
+  
+  <div class="grid-x">
+    <div class="progress" role="progressbar">
+      <div class="progress-meter" ></div>
+    </div>
+  </div>
   <div class="grid-x">
     <input id="fileupload" type="file" name="file" multiple
           style="display: none;"
           data-url="{% url 'upload' %}"
-          data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>
-  
+          data-form-data='{"csrfmiddlewaretoken": "{{ csrf_token }}"}'>  
   </div>
+
   <div class="grid-x">
-    <table id="gallery">
+    <div id="files" class="files"></div>
+  </div>
+
+  <div class="grid-x">
+    <a type="button" class="success button" href="{% url 'submit' %}">Submit session</a>
+  </div>
+
+  <div class="grid-x">
+        <table id="gallery">
       <thead>
         <tr>
-          <th>Document</th>
+          <th>Session files</th>
         </tr>
       </thead>
       <tbody>
         {% for document in documents %}
           <tr>
             <td><a href="{{ document.file.url }}">{{ document.file.name }}</a></td>
+            <td><a href="{% url 'delete' document.pk %}" class="alert button">Delete</a></td>
           </tr>
         {% endfor %}
       </tbody>
@@ -42,5 +58,7 @@
 <script src="{% static 'js/jquery-file-upload/vendor/jquery.ui.widget.js' %}"></script>
 <script src="{% static 'js/jquery-file-upload/jquery.iframe-transport.js' %}"></script>
 <script src="{% static 'js/jquery-file-upload/jquery.fileupload.js' %}"></script>
+<script src="{% static 'js/jquery-file-upload/jquery.fileupload-process.js' %}"></script>
+<script src="{% static 'js/jquery-file-upload/jquery.fileupload-validate.js' %}"></script>
 <script src="{% static 'js/basic-upload.js' %}"></script>
 {% endblock%}

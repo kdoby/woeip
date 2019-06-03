@@ -82,9 +82,8 @@ class Data(models.Model):
     latlon = PointField()
 
 
-# Simple is better than complex tutorial
-
-class Document(models.Model):
-    title = models.CharField(max_length=255, blank=True)
-    file = models.FileField(upload_to='documents/')
+class UploadedFile(models.Model):
+    file = models.FileField(upload_to='uploads/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_by = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
+    processed = models.BooleanField(default=False)

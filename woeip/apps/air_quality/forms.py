@@ -1,7 +1,10 @@
 from django import forms
+import logging
 from pytz import common_timezones
 
 from woeip.apps.air_quality import models
+
+logger = logging.getLogger(__name__)
 
 # class DustrakSessionForm(forms.ModelForm):
 #     air_quality = forms.FileField()
@@ -13,7 +16,8 @@ from woeip.apps.air_quality import models
 #         fields = ('collected_by', 'date_collected', 'route', 'air_quality', 'gps', 'timezone')
 
 
-class DocumentForm(forms.ModelForm):
+class UploadForm(forms.ModelForm):
+    
     class Meta:
-        model = models.Document
+        model = models.UploadedFile
         fields = ('file',)
