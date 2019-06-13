@@ -19,3 +19,14 @@ class SessionDataForm(forms.ModelForm):
         self.fields['upload_gps'].widget.attrs.update({
             'class': 'callout primary large text-center'
             })
+
+# Document that it doesn't link to a model because the values are split between two models: session and sessionData
+class SessionForm(forms.Form):
+    start_datetime = forms.DateTimeField()
+    collected_by = forms.
+    class Meta():
+        # Start datetime
+        # Device
+        # Collected by
+        model = models.Session
+        fields = ()

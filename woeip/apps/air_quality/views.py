@@ -23,12 +23,23 @@ class Upload(LoginRequiredMixin, View):
         files = self.request.FILES
         form = SessionDataForm(self.request.POST, files)
         if form.is_valid():
-            form.save()
-            path = redirect('view_session_data')
+            sessionData = form.save()
+            messages.add_message(self.request, messages.SUCCESS, 'Files successfully uploaded')
+            path = redirect('review_upload', sessionData_id = sessionData.id)
         else:
             messages.add_message(self.request, messages.ERROR, 'File upload error')
             path = redirect('upload')
         return path
+
+
+# TODO: Add logic to allow this to be used to edit already existing sessions
+# Add if/else check of whether a session already exists for the Session ID.
+# If it is absent, open the files and meta data from there. Else, use the data that already exists in the database
+class ReviewUpload(LoginRequiredMixin, View):
+    def get(self, request, sessionData_id):
+        return render(self.request, 'air_quality/review_upload.html', {
+            'sessionData_id': sessionData_id
+        })
 
 
 class ViewSessionData(View):
@@ -36,5 +47,7 @@ class ViewSessionData(View):
     def get(self, request):
         sessionData_list = SessionData.objects.all()
         return render(self.request, 'air_quality/view_data.html', {
-            'sessionData': sessionData_list
+            'sessionData': sessionData_list,      
         })
+    # context = {'cleanup': get_object_or_404(Cleanup, id=kwargs['pk'])}
+    # return render(request, 'cleanups/edit.html', context)
