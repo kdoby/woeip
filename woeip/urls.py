@@ -1,5 +1,8 @@
 from django.contrib import admin
 from django.urls import include, path
+# TODO: Document adding development specific media url
+from django.conf import settings
+from django.conf.urls.static import static
 
 from .apps.air_quality import views
 from .apps.core.views import health
@@ -14,3 +17,7 @@ urlpatterns = [
     path('view_session_data/', views.ViewSessionData.as_view(), name='view_session_data'),
     path('review_upload/(?P<sessionData_id>\d+)/', views.ReviewUpload.as_view(), name='review_upload')
 ]
+
+# Document Development access to static files
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
