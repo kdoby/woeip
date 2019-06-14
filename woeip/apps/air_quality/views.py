@@ -5,8 +5,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect, render
 from django.views import View
 
-from .forms import SessionDataForm
-from .models import SessionData
+from .forms import SessionDataForm, SessionForm
+from .models import SessionData, User
+from .dustrak import load_dustrak
+
+from django.utils.encoding import force_text
+import urllib
 
 logger = logging.getLogger(__name__)
 
@@ -35,10 +39,27 @@ class Upload(LoginRequiredMixin, View):
 # TODO: Add logic to allow this to be used to edit already existing sessions
 # Add if/else check of whether a session already exists for the Session ID.
 # If it is absent, open the files and meta data from there. Else, use the data that already exists in the database
+# TODO: Open Dustrak CSV file to extract key values
 class ReviewUpload(LoginRequiredMixin, View):
     def get(self, request, sessionData_id):
+        # Get header from dustrak file
+        default_timezone = 'America/Los_Angeles'
+        session_data = SessionData.objects.get(id=sessionData_id)
+        dustrak_file_location = urllib.request(session_data.upload.url)
+        dustrak_file_read = force_text(dustrak_file_location.read())
+        dustrak_file_content = load_dustrak(dustrak_file_read, default_timezone)
+        dustrak_file_header = dustrak_file_content[0]
+
+        form = SessionForm(initial= {
+            'collected_by': User.objects.get(id=request.user.id),
+            'timezone': default_timezone
+        })
+
+        # TODO: Reload data contents, if timezone is different
         return render(self.request, 'air_quality/review_upload.html', {
-            'sessionData_id': sessionData_id
+            'sessionData_id': sessionData_id,
+            'dustrak_file_location': dustrak_file_location,
+            'form': form
         })
 
 
@@ -49,5 +70,3 @@ class ViewSessionData(View):
         return render(self.request, 'air_quality/view_data.html', {
             'sessionData': sessionData_list,      
         })
-    # context = {'cleanup': get_object_or_404(Cleanup, id=kwargs['pk'])}
-    # return render(request, 'cleanups/edit.html', context)

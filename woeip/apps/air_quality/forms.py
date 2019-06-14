@@ -1,4 +1,5 @@
 from django import forms
+from pytz import common_timezones
 
 from woeip.apps.air_quality import models
 
@@ -20,13 +21,10 @@ class SessionDataForm(forms.ModelForm):
             'class': 'callout primary large text-center'
             })
 
+
 # Document that it doesn't link to a model because the values are split between two models: session and sessionData
 class SessionForm(forms.Form):
-    start_datetime = forms.DateTimeField()
-    collected_by = forms.
-    class Meta():
-        # Start datetime
-        # Device
-        # Collected by
-        model = models.Session
-        fields = ()
+    start_datetime = forms.DateTimeField(label="Start day and time", input_formats=["%d %b %Y %H:%M:%S %Z"])
+    timezone = forms.ChoiceField(label="Timezone", choices=[(x, x) for x in common_timezones])
+    collected_by = forms.ModelChoiceField(label="Collected by", queryset=models.User.objects.all())
+    device_name = forms.CharField(label="Device name")
