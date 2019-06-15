@@ -35,6 +35,5 @@ services:
       - .:/app/woeip:cached
       # Uncomment this line to ensure log files are exposed on the host machine.
       # - ./logs:/logs
-      - ./woeip/media ## Remove if able
 volumes:
   db-data:

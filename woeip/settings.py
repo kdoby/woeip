@@ -141,8 +141,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 PUBLIC_ROOT = env('PUBLIC_ROOT', cast=str, default=str(repo_root.path('public')))
-# MEDIA_ROOT = str(environ.Path(PUBLIC_ROOT).path('media'))
-MEDIA_ROOT = str(project_root.path('media')) ## TODO: Remove if able
+MEDIA_ROOT = str(environ.Path(PUBLIC_ROOT).path('media'))
 MEDIA_URL = '/media/'
 STATIC_ROOT = str(environ.Path(PUBLIC_ROOT).path('static'))
 STATIC_URL = '/static/'

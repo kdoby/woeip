@@ -1,0 +1,30 @@
+{% extends '__base.html' %}
+{% block content %}
+<div class="grid container large-offset-1">
+    <div class="grid-x">
+        <div class="cell small-8">
+            <h2>Please confirm your data</h2>
+        </div>
+    </div>
+    <div class="grid-x">
+        <div class="cell small-8">
+            <h3>Session {{ session_data.id }}</h3>
+        </div>
+    </div>
+    <div class="grid-x">
+        <div class="cell small-8">
+            <h3><a href="{{ session_data.sensor_file.url }}">DusTrak File</a></h3>
+        </div>
+    </div>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="grid-x">
+            <div class="cell small-8">
+            {{ form.as_p }}
+        </div>
+        </div>
+        <button class="button warning" type="reset">Reset values</button>
+        <button class="button" type="submit">Save</button>
+    </form>
+</div>
+{% endblock %}
