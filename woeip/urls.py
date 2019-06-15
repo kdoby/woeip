@@ -14,8 +14,8 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
     path('health/', health, name='health'),
-    path('view_session_data/', views.ViewSessionData.as_view(), name='view_session_data'),
-    path('review_upload/(?P<sessionData_id>\d+)/', views.ReviewUpload.as_view(), name='review_upload')
+    path('review_upload/(?P<sessionData_id>\d+)/', views.ReviewUpload.as_view(), name='review_upload'),
+    path('view/', views.ViewSessionData.as_view(), name='view')
 ]
 
 # Document Development access to static files

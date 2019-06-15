@@ -39,7 +39,9 @@ class Upload(LoginRequiredMixin, View):
             path = redirect('review_upload', sessionData_id = sessionData.id)
         else:
             messages.add_message(self.request, messages.ERROR, 'File upload error')
-            path = redirect('upload')
+            path = render(self.request, 'air_quality/upload.html', {
+                'form': SessionDataForm
+            })
         return path
 
 
@@ -89,7 +91,7 @@ class ReviewUpload(LoginRequiredMixin, View):
 class ViewSessionData(View):
     """Provide temporary development page to view all uploaded SessionDatas."""
     def get(self, request):
-        sessionData_list = SessionData.objects.all()
-        return render(self.request, 'air_quality/view_data.html', {
-            'sessionData': sessionData_list,      
+        session_data_list = SessionData.objects.all()
+        return render(self.request, 'air_quality/view.html', {
+            'session_data_list': session_data_list
         })
